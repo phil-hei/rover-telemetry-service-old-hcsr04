@@ -12,5 +12,11 @@
   <feature name="urn:AGL:widget:required-api">
     <param name="roverconfig" value="ws" />
     <param name="roverdriving" value="ws" />
+    <param name="roverinfraredsensor" value="ws" />
+    <param name="roverdht22" value="ws" />
+    <param name="rovergy521" value="ws" />
+    <param name="rovergrooveultrasonicsensor" value="ws" />
+    <param name="roverutils" value="ws" />
+    <param name="roverhmc5883l" value="ws" />
   </feature>
 </widget>

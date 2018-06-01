@@ -19,18 +19,18 @@
 # Project Info
 # ------------------
 set(PROJECT_NAME rover-telemetry-old)
-set(PROJECT_PRETTY_NAME "Rover Telemetry Old")
-set(PROJECT_DESCRIPTION "Rover Telemetry Old")
-set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/app-templates")
+set(PROJECT_PRETTY_NAME "Rover Telementry Service")
+set(PROJECT_DESCRIPTION "Rover Telementry Service")
+set(PROJECT_URL "https://github.com/app4mc-rover/rover-telemetry-service-old")
 set(PROJECT_ICON "icon.png")
-set(PROJECT_AUTHOR "Cuadra, Pedro")
-set(PROJECT_AUTHOR_MAIL "pjcuadra@gmail.com")
-set(PROJECT_LICENSE "EPL2.0")
+set(PROJECT_AUTHOR "FH Dortmund")
+set(PROJECT_AUTHOR_MAIL "example.man@example.com")
+set(PROJECT_LICENSE "EPL-1")
 set(PROJECT_LANGUAGES "C")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
 # relative to the root project directory
-set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
+set(PROJECT_APP_TEMPLATES_DIR "../app-templates")
 
 # Where are stored your external libraries for your project. This is 3rd party library that you don't maintain
 # but used and must be built and linked.
@@ -41,8 +41,8 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
-#set(CMAKE_BUILD_TYPE "DEBUG")
-#set(USE_EFENCE 1)
+set(CMAKE_BUILD_TYPE "DEBUG")
+# set(USE_EFENCE 1)
 
 # Kernel selection if needed. You can choose between a
 # mandatory version to impose a minimal version.
@@ -65,6 +65,7 @@ set (gcc_minimal_version 4.9)
 # PKG_CONFIG required packages
 # -----------------------------
 set (PKG_REQUIRED_LIST
+	libafbwsc
 	json-c
 	libsystemd>=222
 	afb-daemon
@@ -129,8 +130,8 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional location for config.xml.in
 # -----------------------------------
-#set(WIDGET_ICON "\"conf.d/wgt/${PROJECT_ICON}\"" CACHE PATH "Path to the widget icon")
-#set(WIDGET_CONFIG_TEMPLATE "\"${CMAKE_CURRENT_SOURCE_DIR}/conf.d/wgt/config.xml.in\"" CACHE PATH "Path to widget config file template (config.xml.in)")
+set(WIDGET_ICON ${PROJECT_APP_TEMPLATES_DIR}/wgt/${PROJECT_ICON})
+set(WIDGET_CONFIG_TEMPLATE ${CMAKE_SOURCE_DIR}/conf.d/wgt/config.xml.in CACHE PATH "Path to widget config file template (config.xml.in)")
 
 # Mandatory widget Mimetype specification of the main unit
 # --------------------------------------------------------------------------
@@ -147,14 +148,14 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 #	content.src designates the relative path of the binary.
 #	For such application, only security setup is made.
 #
-set(WIDGET_TYPE MimeType_Not_Set)
+set(WIDGET_TYPE application/vnd.agl.native)
 
 # Mandatory Widget entry point file of the main unit
 # --------------------------------------------------------------
 # This is the file that will be executed, loaded,
 # at launch time by the application framework.
 #
-set(WIDGET_ENTRY_POINT EntryPoint_Path_Not_Set)
+set(WIDGET_ENTRY_POINT bin/rover-telemetry-old)
 
 # Optional dependencies order
 # ---------------------------
@@ -184,7 +185,7 @@ set(AFB_REMPORT "1234" CACHE PATH "Default binder listening port")
 
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
-set(CLOSING_MESSAGE "Typical binding launch: cd ${CMAKE_BINARY_DIR}/package && afb-daemon --port=${AFB_REMPORT} --workdir=. --ldpaths=lib --roothttp=htdocs  --token=\"${AFB_TOKEN}\" --tracereq=common --verbose")
+set(CLOSING_MESSAGE "Typical binding launch: afb-daemon --port=${AFB_REMPORT} --workdir=${CMAKE_BINARY_DIR}/package --ldpaths=lib --roothttp=htdocs  --token=\"${AFB_TOKEN}\" --tracereq=common --verbose")
 set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # Optional schema validator about now only XML, LUA and JSON

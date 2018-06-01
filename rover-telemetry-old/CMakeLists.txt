@@ -13,5 +13,5 @@ SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 
 # Library dependencies (include updates automatically)
 TARGET_LINK_LIBRARIES(${TARGET_NAME}
-	${link_libraries} rover-services-api roverapi ${libafbwsc_LIBRARIES}
+	${link_libraries} rover-services-api roverapi wiringPi json-c ${libafbwsc_LIBRARIES}
 )

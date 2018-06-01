@@ -30,6 +30,16 @@
 #include <afb/afb-ws-client.h>
 #include <app/RoverConfig.h>
 #include <app/RoverDriving.h>
+#include <app/RoverInfraredSensor.h>
+#include <app/RoverGrooveUltrasonicSensor.h>
+#include <app/RoverBuzzer.h>
+#include <app/RoverUtils.h>
+#include <app/RoverDisplay.h>
+#include <app/RoverButtons.h>
+#include <app/RoverDriving.h>
+#include <app/RoverDht22.h>
+#include <app/RoverGy521.h>
+#include <app/RoverHmc5883L.h>
 
 #include <roverapi/rover_pahomqtt.hpp>
 #include <roverapi/rover_mqttcommand.hpp>
@@ -55,37 +65,104 @@ void drive_rover(RoverDriving &driving, int speed, char command) {
       driving.setspeed(speed);
       driving.turnleft();
       break;
+    case 'Q':
+      driving.setspeed(speed);
+      driving.turnforwardleft();
+      break;
+    case 'E':
+      driving.setspeed(speed);
+      driving.turnforwardright();
+      break;
+    case 'A':
+      driving.setspeed(speed);
+      driving.turnbackwardleft();
+      break;
+    case 'D':
+      driving.setspeed(speed);
+      driving.turnbackwardright();
+      break;
+    case 'F':
+      break;
     default:
       driving.stop();
   }
 }
 
-void get_sensor_data(RoverSensorData_t &sensor_data) {
-  sensor_data.ultrasonic_front = 1;
-	sensor_data.ultrasonic_rear = 2;
-	sensor_data.hmc5883l_bearing = 3;
-	sensor_data.infrared[0] = 4;
-	sensor_data.infrared[1] = 5;
-	sensor_data.infrared[2] = 6;
-	sensor_data.infrared[3] = 7;
-	sensor_data.gy521_accel_x = 8;
-  sensor_data.gy521_accel_y = 9;
-	sensor_data.gy521_accel_z = 10;
-	sensor_data.gy521_gyro_x = 11;
-	sensor_data.gy521_gyro_y = 12;
-	sensor_data.gy521_gyro_z = 13;
-	sensor_data.gy521_angle_x = 14;
-	sensor_data.gy521_angle_y = 15;
-	sensor_data.gy521_angle_z = 16;
-	sensor_data.core[0] = 17;
-	sensor_data.core[1] = 18;
-	sensor_data.core[2] = 19;
-	sensor_data.core[3] = 20;
+inline void get_ultrasonic_sensor_data(RoverGrooveUltrasonicSensor &sensor,
+  RoverSensorData_t &sensor_data) {
+  double sensor_val = 0;
+
+  sensor.read(rover_sensor_id::front, sensor_val);
+  sensor_data.ultrasonic_front = sensor_val;
+  sensor.read(rover_sensor_id::rear, sensor_val);
+	sensor_data.ultrasonic_rear = sensor_val;
+}
+
+inline void get_infrared_sensor_data(RoverInfraredSensor &sensor,
+  RoverSensorData_t &sensor_data) {
+  double sensor_val = 0;
+
+  sensor.read(rover_sensor_id::rear_right, sensor_val);
+  sensor_data.infrared[3] = sensor_val;
+  sensor.read(rover_sensor_id::rear_left, sensor_val);
+  sensor_data.infrared[2] = sensor_val;
+  sensor.read(rover_sensor_id::front_right, sensor_val);
+  sensor_data.infrared[1] = sensor_val;
+  sensor.read(rover_sensor_id::front_left, sensor_val);
+  sensor_data.infrared[0] = sensor_val;
+}
+
+inline void get_bearing_sensor_data(RoverHmc5883L &sensor,
+  RoverSensorData_t &sensor_data) {
+  double sensor_val = 0;
+
+  sensor.read(sensor_val);
+  sensor_data.hmc5883l_bearing = sensor_val;
+
+}
+
+inline void get_gy521_sensor_data(RoverGy521 &sensor,
+  RoverSensorData_t &sensor_data) {
+  double sensor_val = 0;
+  int int_sensor_val = 0;
+
+  sensor.read_acc_x(int_sensor_val);
+  sensor_data.gy521_accel_x = int_sensor_val;
+  sensor.read_acc_y(int_sensor_val);
+  sensor_data.gy521_accel_y = int_sensor_val;
+  sensor.read_acc_z(int_sensor_val);
+  sensor_data.gy521_accel_z = int_sensor_val;
+
+  sensor.read_gyro_x(int_sensor_val);
+  sensor_data.gy521_gyro_x = int_sensor_val;
+  sensor.read_gyro_y(int_sensor_val);
+  sensor_data.gy521_gyro_y = int_sensor_val;
+  sensor.read_gyro_z(int_sensor_val);
+  sensor_data.gy521_gyro_z = int_sensor_val;
+
+  sensor.read_angle_x(sensor_val);
+  sensor_data.gy521_angle_x = sensor_val;
+  sensor.read_angle_y(sensor_val);
+  sensor_data.gy521_angle_y = sensor_val;
+  sensor.read_angle_z(sensor_val);
+  sensor_data.gy521_angle_z = sensor_val;
+}
+
+inline void get_core_util_data(RoverUtils &util,
+  RoverSensorData_t &sensor_data) {
+  const int num_cores = 4;
+  double core_utils[num_cores];
+
+  util.get_core_utilization(core_utils, num_cores);
+
+  for (int i = 0; i < num_cores; i++) {
+    sensor_data.core[i] = core_utils[i];
+  }
+
 }
 
 /* entry function */
-int main(int ac, char **av, char **env)
-{
+int main(int ac, char **av, char **env) {
 	int rc = 0;
   RoverMQTTCommand *rover_mqtt;
   string host;
@@ -116,6 +193,12 @@ int main(int ac, char **av, char **env)
   // Create services objects
   RoverConfig config(uri);
   RoverDriving driving(uri);
+  RoverInfraredSensor inf_red(uri);
+  RoverGrooveUltrasonicSensor grv_sen(uri);
+  RoverDht22 dht_sen(uri);
+  RoverGy521 gy_sen(uri);
+  RoverUtils util(uri);
+  RoverHmc5883L bear_sen(uri);
 
   // Get all configuration values
   rt = config.get("MQTT_BROKER_C", host);
@@ -184,6 +267,11 @@ int main(int ac, char **av, char **env)
 		}
 
     get_sensor_data(sensor_data);
+    get_ultrasonic_sensor_data(grv_sen, sensor_data);
+    get_infrared_sensor_data(inf_red, sensor_data);
+    get_bearing_sensor_data(bear_sen, sensor_data);
+    get_gy521_sensor_data(gy_sen, sensor_data);
+    get_core_util_data(util, sensor_data);
 
     if (use_redirected_topics) {
 			rt = rover_mqtt->publishToTelemetryTopic(sensor_data);
@@ -198,6 +286,8 @@ int main(int ac, char **av, char **env)
     } else {
       AFB_NOTICE("Client rover_mqtt_publisher: Publishing unsuccessful");
     }
+
+    usleep(300000);
   }
 
   if (rc) {
