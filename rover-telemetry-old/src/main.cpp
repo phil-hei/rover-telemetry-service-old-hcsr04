@@ -266,7 +266,6 @@ int main(int ac, char **av, char **env) {
       drive_rover(driving, control_data.speed, control_data.command);
 		}
 
-    get_sensor_data(sensor_data);
     get_ultrasonic_sensor_data(grv_sen, sensor_data);
     get_infrared_sensor_data(inf_red, sensor_data);
     get_bearing_sensor_data(bear_sen, sensor_data);
