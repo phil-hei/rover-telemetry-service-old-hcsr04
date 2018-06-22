@@ -28,6 +28,12 @@ set(PROJECT_AUTHOR_MAIL "example.man@example.com")
 set(PROJECT_LICENSE "EPL-1")
 set(PROJECT_LANGUAGES "C")
 
+execute_process(COMMAND git describe --abbrev=0
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	OUTPUT_VARIABLE KUKSA_PROJECT_VERSION
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
 # relative to the root project directory
 set(PROJECT_APP_TEMPLATES_DIR "./conf.d/app-templates")

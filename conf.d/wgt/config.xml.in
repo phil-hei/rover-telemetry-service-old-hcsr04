@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" id="@PROJECT_NAME@" version="@PROJECT_VERSION@">
+<widget xmlns="http://www.w3.org/ns/widgets" id="@PROJECT_NAME@" version="@KUKSA_PROJECT_VERSION@">
   <name>@PROJECT_NAME@</name>
   <icon src="@PROJECT_ICON@"/>
   <content src="@WIDGET_ENTRY_POINT@" type="@WIDGET_TYPE@"/>
