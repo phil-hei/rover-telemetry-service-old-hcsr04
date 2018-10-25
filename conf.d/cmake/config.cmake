@@ -27,6 +27,7 @@ set(PROJECT_AUTHOR "FH Dortmund")
 set(PROJECT_AUTHOR_MAIL "example.man@example.com")
 set(PROJECT_LICENSE "EPL-1")
 set(PROJECT_LANGUAGES "C")
+set(PROJECT_VERSION "1.0.0")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
 # relative to the root project directory
