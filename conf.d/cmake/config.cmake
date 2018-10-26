@@ -27,6 +27,7 @@ set(PROJECT_AUTHOR "FH Dortmund")
 set(PROJECT_AUTHOR_MAIL "example.man@example.com")
 set(PROJECT_LICENSE "EPL-1")
 set(PROJECT_LANGUAGES "C")
+set(PROJECT_VERSION "1.0.0")
 
 execute_process(COMMAND git describe --abbrev=0
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
