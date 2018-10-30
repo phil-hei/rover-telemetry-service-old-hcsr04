@@ -31,7 +31,7 @@
 #include <app/RoverConfig.h>
 #include <app/RoverDriving.h>
 #include <app/RoverInfraredSensor.h>
-#include <app/RoverGrooveUltrasonicSensor.h>
+#include <app/RoverHcsr04UltrasonicSensor.h>
 #include <app/RoverBuzzer.h>
 #include <app/RoverUtils.h>
 #include <app/RoverDisplay.h>
@@ -88,7 +88,7 @@ void drive_rover(RoverDriving &driving, int speed, char command) {
   }
 }
 
-inline void get_ultrasonic_sensor_data(RoverGrooveUltrasonicSensor &sensor,
+inline void get_ultrasonic_sensor_data(RoverHcsr04UltrasonicSensor &sensor,
   RoverSensorData_t &sensor_data) {
   double sensor_val = 0;
 
@@ -163,7 +163,7 @@ inline void get_core_util_data(RoverUtils &util,
 
 /* entry function */
 int main(int ac, char **av, char **env) {
-	int rc = 0;
+  int rc = 0;
   RoverMQTTCommand *rover_mqtt;
   string host;
   char * host_c;
@@ -179,7 +179,7 @@ int main(int ac, char **av, char **env) {
   RoverControlData_t control_data;
   RoverSensorData_t sensor_data;
   int rt = -1;
-	int try_count = 0;
+  int try_count = 0;
 	const int max_tries = 100;
 
 
@@ -194,39 +194,19 @@ int main(int ac, char **av, char **env) {
   RoverConfig config(uri);
   RoverDriving driving(uri);
   RoverInfraredSensor inf_red(uri);
-  RoverGrooveUltrasonicSensor grv_sen(uri);
+  RoverHcsr04UltrasonicSensor
+  ult_sen(uri);
   RoverDht22 dht_sen(uri);
   RoverGy521 gy_sen(uri);
   RoverUtils util(uri);
   RoverHmc5883L bear_sen(uri);
 
-  // Get all configuration values
-  rt = config.get("MQTT_BROKER_C", host);
-  rt = config.get("MQTT_USERNAME_C", username);
-  rt = config.get("MQTT_PASSWORD_C", passwd);
-
-  rt = config.get("MQTT_BROKER_PORT_C", config_val);
-  host_port = stoi(config_val);
-
-  rt = config.get("ROVER_IDENTITY_C", config_val);
-  rover_id = stoi(config_val);
-
-  rt = config.get("ROVER_MQTT_QOS_C", config_val);
-  qos = stoi(config_val);
-
-  host_c = strdup(host.c_str());
-  username_c = strdup(username.c_str());
-  passwd_c = strdup(passwd.c_str());
-
-  rt = config.get("USE_REDIRECTED_TOPICS_C", config_val);
-  use_redirected_topics = stoi(config_val);
-
-  rover_mqtt = new RoverMQTTCommand(host_c,
-										                host_port,
-									                	rover_id,
-								                		qos,
-							                   		username_c,
-							                			passwd_c,
+  rover_mqtt = new RoverMQTTCommand("idial.institute",
+										                1883,
+									                	1,
+								                		0,
+							                   		"rover2@rover",
+							                			"rover-secret",
 									                	"rover_mqtt_publisher");
 
 
@@ -266,19 +246,16 @@ int main(int ac, char **av, char **env) {
       drive_rover(driving, control_data.speed, control_data.command);
 		}
 
-    get_ultrasonic_sensor_data(grv_sen, sensor_data);
+    get_ultrasonic_sensor_data(ult_sen, sensor_data);
     get_infrared_sensor_data(inf_red, sensor_data);
     get_bearing_sensor_data(bear_sen, sensor_data);
     get_gy521_sensor_data(gy_sen, sensor_data);
     get_core_util_data(util, sensor_data);
 
-    if (use_redirected_topics) {
-			rt = rover_mqtt->publishToTelemetryTopic(sensor_data);
-      AFB_NOTICE("Using Redirected Publishing");
-		} else {
-      rt = rover_mqtt->publishToTelemetryTopicNonRedirected(sensor_data);
-      AFB_NOTICE("Using NonRedirected Publishing");
-		}
+
+	rt = rover_mqtt->publishToTelemetryTopic(sensor_data);
+    AFB_NOTICE("Using Redirected Publishing");
+	
 
     if (!rt) {
       AFB_NOTICE("Client rover_mqtt_publisher: Publishing successful");
