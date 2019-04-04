@@ -15,7 +15,7 @@
     <param name="roverinfraredsensor" value="ws" />
     <param name="roverdht22" value="ws" />
     <param name="rovergy521" value="ws" />
-    <param name="rovergrooveultrasonicsensor" value="ws" />
+    <param name="roverhcsr04ultrasonicsensor" value="ws" />
     <param name="roverutils" value="ws" />
     <param name="roverhmc5883l" value="ws" />
   </feature>
